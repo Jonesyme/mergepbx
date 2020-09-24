@@ -127,7 +127,7 @@ def create_auto_merge_dict(attribute, optional = False):
 
 class PBXProjectFileMerger3(Merger):
     SUPPORTED_ARCHIVE_VERSIONS = set((1,))
-    SUPPORTED_OBJECT_VERSIONS = set((46,))
+    SUPPORTED_OBJECT_VERSIONS = set((80,))
 
     def merge(self, base, mine, theirs):
         result = OrderedDict()
