@@ -127,7 +127,7 @@ def create_auto_merge_dict(attribute, optional = False):
 
 class PBXProjectFileMerger3(Merger):
     SUPPORTED_ARCHIVE_VERSIONS = set((1,))
-    SUPPORTED_OBJECT_VERSIONS = set((80,))
+    SUPPORTED_OBJECT_VERSIONS = range(40,80)
 
     def merge(self, base, mine, theirs):
         result = OrderedDict()
@@ -342,7 +342,13 @@ class PBXVariantGroupMerger3(_SimpleDictMerger3):
 
 class XCVersionGroupMerger3(_SimpleDictMerger3):
     merge_files = create_auto_merge_set("children")
-
+    
+class XCSwiftPackageProductDependencyMerger3(_SimpleDictMerger3):
+    merge_productName = create_auto_merge_set("productName", optional = True)
+    
+class XCRemoteSwiftPackageReferenceMerger3(_SimpleDictMerger3):
+    merge_requirement = create_auto_merge_set("requirement", optional = True)
+    
 Value3 = namedtuple("Value3", ("base", "mine", "theirs"))
 
 def _get_3(key, base, mine, theirs, optional = False, replace_value = None):

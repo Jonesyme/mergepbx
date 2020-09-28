@@ -191,6 +191,20 @@ class XCVersionGroup(PBXISA, PBXISADictionaryBound):
         else:
             return self.path
 
+class XCRemoteSwiftPackageReference(PBXISA, PBXISADictionaryBound):
+    def __init__(self, *args, **kwargs):
+        super(XCRemoteSwiftPackageReference, self).__init__(*args, **kwargs)
+    
+    def get_name(self, project):
+        return self.name
+    
+class XCSwiftPackageProductDependency(PBXISA, PBXISADictionaryBound):
+        def __init__(self, *args, **kwargs):
+            super(XCSwiftPackageProductDependency, self).__init__(*args, **kwargs)
+        
+        def get_name(self, project):
+            return self.name
+    
 local_vars = dict(locals())
 ISA_MAPPING = dict(
     ((clazz.__name__, clazz) for varname, clazz in local_vars.iteritems() if isclass(clazz) and issubclass(clazz, PBXISA))
