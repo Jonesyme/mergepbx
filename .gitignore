@@ -4,3 +4,6 @@
 mergepbx
 *~
 *.bak
+/.noseids
+/.pytest_cache
+/.vscode
