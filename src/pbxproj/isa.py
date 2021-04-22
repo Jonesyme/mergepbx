@@ -29,6 +29,10 @@ class PBXBuildFile(PBXISA, PBXISADictionaryBound):
             fileRef = self.fileRef
             file = project.get_objects().get(fileRef)
             name = file.get_name(project)
+        elif self.has_attr("productRef"):
+            productRef = self.productRef
+            file = project.get_objects().get(productRef)
+            name = file.get_name(project)
         else:
             name = "(null)"
         container = project.phase_of_object(self._identifier)
@@ -48,7 +52,7 @@ class AbstractPBXBuildPhase(PBXISADictionaryBound):
             if default_name is not None:
                 return default_name
             else:
-                return "(null)"
+                return "CopyFiles"
 
 class PBXCopyFilesBuildPhase(AbstractPBXBuildPhase, PBXISA):
     pass
@@ -196,15 +200,20 @@ class XCRemoteSwiftPackageReference(PBXISA, PBXISADictionaryBound):
         super(XCRemoteSwiftPackageReference, self).__init__(*args, **kwargs)
     
     def get_name(self, project):
-        return self.name
-    
+        dependencies = project.get_objects().getobjects("XCSwiftPackageProductDependency")
+        dependencyName = [productDependency[1].get_name(project) for productDependency in dependencies if productDependency[1].package == self._identifier]
+        return "XCRemoteSwiftPackageReference \"%s\""%(dependencyName[0])
+                    
 class XCSwiftPackageProductDependency(PBXISA, PBXISADictionaryBound):
         def __init__(self, *args, **kwargs):
             super(XCSwiftPackageProductDependency, self).__init__(*args, **kwargs)
         
         def get_name(self, project):
-            return self.name
-    
+            if hasattr(self, "name"):
+                return self.name
+            else:
+                return self.productName    
+
 local_vars = dict(locals())
 ISA_MAPPING = dict(
     ((clazz.__name__, clazz) for varname, clazz in local_vars.iteritems() if isclass(clazz) and issubclass(clazz, PBXISA))

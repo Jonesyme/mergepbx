@@ -123,10 +123,14 @@ class PBXProjectPlistWriter(NSPlistWriter):
             object = self.pbxproj.get_objects().get(identifier)
         except KeyError:
             return None # if object does not exist, make no comment about it
+
         if object == None:
             return None
         else:
-            return object.get_name(self.pbxproj)
+            try:
+                return object.get_name(self.pbxproj)
+            except KeyError:
+                return None # if object does not exist, make no comment about it
 
 def write_pbx(fname_or_f, data, encoding=None):
     if encoding is None:

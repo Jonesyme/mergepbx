@@ -344,10 +344,16 @@ class XCVersionGroupMerger3(_SimpleDictMerger3):
     merge_files = create_auto_merge_set("children")
     
 class XCSwiftPackageProductDependencyMerger3(_SimpleDictMerger3):
-    merge_productName = create_auto_merge_set("productName", optional = True)
+    def merge_productName(self, base, mine, theirs, result, diff3):
+        base_productName, mine_productName, theirs_productName = _get_3("productName", base, mine, theirs)
+
+        if not base_productName == mine_productName or not base_productName == theirs_productName:
+            raise MergeException("can't merge XCSwiftPackageProductDependencyMerger3 whose productName has changed")
+
+        return result
     
 class XCRemoteSwiftPackageReferenceMerger3(_SimpleDictMerger3):
-    merge_requirement = create_auto_merge_set("requirement", optional = True)
+    merge_requirement = create_auto_merge_dict("requirement", optional = True)
     
 Value3 = namedtuple("Value3", ("base", "mine", "theirs"))
 
