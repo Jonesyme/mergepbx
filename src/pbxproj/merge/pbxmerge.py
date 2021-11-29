@@ -28,6 +28,8 @@ class MergeStrategyManager(object):
         self.strategies = {}
 
         for key, strategie_class in strategies.iteritems():
+            print "Parsing section .......... %s" % ( key )
+
             self.strategies[key] = strategie_class(self)
 
     def get_merger(self, strategy):
@@ -263,8 +265,10 @@ class PBXGroupMerger3(_SimpleDictMerger3):
 
 class _AbstractTargetMerger3(_SimpleDictMerger3):
     merge_buildPhases = create_auto_merge_set("buildPhases", optional = True)
+    merge_buildRules = create_auto_merge_set("buildRules", optional = True)
     merge_dependencies = create_auto_merge_set("dependencies", optional = True)
     merge_files = create_auto_merge_set("files", optional = True)
+    merge_fproductName = create_auto_merge_set("productName", optional = True)
 
 class PBXFrameworksBuildPhaseMerger3(_AbstractTargetMerger3):
     pass
@@ -278,9 +282,14 @@ class PBXLegacyTargetMerger3(_AbstractTargetMerger3):
 class PBXNativeTargetMerger3(_AbstractTargetMerger3):
     pass
 
+class PBXAggregateTargetMerger3(_SimpleDictMerger3):
+    pass
+
 class PBXShellScriptBuildPhaseMerger3(_AbstractTargetMerger3):
-    merge_buildPhases = create_auto_merge_set("inputPaths", optional = True)
-    merge_dependencies = create_auto_merge_set("outputPaths", optional = True)
+    merge_inputFileListPaths = create_auto_merge_set("inputFileListPaths", optional = True)
+    merge_inputPaths = create_auto_merge_set("inputPaths", optional = True)
+    merge_outputFileListPaths = create_auto_merge_set("outputFileListPaths", optional = True)
+    merge_outputPaths = create_auto_merge_set("outputPaths", optional = True)
     merge_files = create_auto_merge_set("files", optional = True)
 
 class PBXReferenceProxyMerger3(_SimpleDictMerger3):
@@ -294,8 +303,10 @@ class PBXTargetDependencyMerger3(_SimpleDictMerger3):
 
 class PBXProjectMerger3(_SimpleDictMerger3):
     merge_knownRegions = create_auto_merge_set("knownRegions", optional = True)
+    merge_packageRefs = create_auto_merge_set("packageReferences", optional = True)
     merge_targets = create_auto_merge_set("targets")
     merge_attributes = create_auto_merge_dict("attributes", optional = True)
+    
 
 class PBXSourcesBuildPhaseMerger3(_SimpleDictMerger3):
     merge_files = create_auto_merge_set("files")

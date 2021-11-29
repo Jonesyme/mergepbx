@@ -115,6 +115,12 @@ class PBXNativeTarget(PBXISA, PBXISADictionaryBound):
     def get_name(self, project):
         return self.name
 
+class PBXAggregateTarget(PBXISA, PBXISADictionaryBound):
+    def __init__(self, *args, **kwargs):
+        super(PBXAggregateTarget, self).__init__(*args, **kwargs)
+
+        return self.get_identifier()
+
 class PBXProject(PBXISA, PBXISADictionaryBound):
     def __init__(self, *args, **kwargs):
         super(PBXProject, self).__init__(*args, **kwargs)
@@ -226,5 +232,5 @@ def create(identifier, isa_dict):
     isa = isa_dict["isa"]
     isa_class = ISA_MAPPING.get(isa, None)
     if isa_class is None:
-        raise ValueError("Unknown entry in project file: %s" % isa)
+        raise ValueError("Unknown entry in project file: %s" % ( isa ))
     return isa_class(identifier, isa_dict)

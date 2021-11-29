@@ -40,6 +40,11 @@ def merge_pbx_files(basef, minef, theirsf, mergedf):
 
     merged_project = merge_pbxs(base, mine, theirs)
 
+
+    print "==================================================================\n"
+    print "========  (THESKIMM) using MERGE PBX on target file: %s  =========\n" % (base)
+    print "==================================================================\n"
+
     pbxproj.write(mergedf, merged_project)
 
 def find_fixtures(path):
@@ -63,7 +68,7 @@ def merge_fixtures(fixtures_dir):
 
     for fixture in fixtures:
         print \
-            ("Merging \n" + \
+            ("Merging Fixure: \n" + \
             "\tbase: %s\n" + \
             "\tmine: %s\n" + \
             "\ttheirs: %s\n" + \
