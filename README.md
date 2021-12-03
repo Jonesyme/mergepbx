@@ -1,122 +1,90 @@
-# mergepbx #
+# MergePBX - Jonesy's Fork
 
-A tool for merging Xcode project files in git
+### **What is it:** A tool to help git properly merge and rebase Xcode generated PBX files (i.e ".pbxproj") 
+### **Does it really work:** Yes, it really works.  You will never again have to manually resolve needless conflicts simply because more than one developer modified the PBX file
+### **Why the fork?** The original repo hasn't been updated in 5 years and some newer Xcode features now break the original script
+### **What's in the fork?**
+* Added support for Swift Package Manager (ALL CREDIT for this feature goes to [Daniel Larsen|https://github.com/GrandLarseny] and his [mergepbx fork|https://github.com/GrandLarseny/mergepbx])
+* Added ability to post a message to the console/stdout whenever git invokes MergePBX during an operation. There's two reasons I added this:
+* 1) to confirm whether MergePBX is properly configured and being called in the first place
+* 2) to inform the user which commit, branch, merge, etc. resulted in a PBX conflict 
 
-Version: 0.6 - 2nd Oct 2014
-Status: Alpha
-
-* Follow us on twitter: https://twitter.com/mergepbx
-* Website: http://simonwagner.github.io/mergepbx/
-
-Buy me a cup of tea: [![Donate to mergepbx](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UX3YTWH8DRYVN)
+### **Original Project Information:**
+* Original MergePBX Version:  0.6 - 2nd Oct 2014
+* Status: Alpha
+* Follow MergePBX on twitter: https://twitter.com/mergepbx
+* Original Author's Website (Simon Wagner): http://simonwagner.github.io/mergepbx/
+* Buy Simon a cup of tea: [![Donate to mergepbx](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UX3YTWH8DRYVN)
+* Original code is published as open source under the GNU GPL 3.
 
 ## Why mergepbx? ##
 
-Tracking a Xcode project in a version control system is annoying. Simply adding files can lead to merge conflicts that have to be solved manually, although it would be possible to resolve the conflict automatically, if the merge algorithm would be aware of the structure of Xcode's project file.
+...why sliced bread? 
+Have you ever wasted hours of your day manually resolving merge conflicts in a "pbxproj" file?
+If yes, then MergePBX will change your life.
 
-After long and annoying merge sessions in one of my projects, I came to the conclusion, that writing a merge driver for git which understands the structure of the project file would be a worthwhile endeavour, as it would save me from solving the merge conflicts for my co-workers.
+# How to configure and use with git #
 
-Unfortunately, that script was finished only after the project ended. However, as I didn't want to let the work go to waste, this script is now published as open source under the GNU GPL 3.
+To use this script, you have to configure it as a merge driver for project files.  To do this, you have to take the following steps:
 
-## Status ##
+## Compile source code into an executable file ##
 
-This script needs knowledge about the structure of Xcode's project. However, there doesn't seem to be any documentation (and I would be surprised if there were any). Luckily, the format of the project file is a plain text Plist, so reverse engineering the structure is rather easy.
-
-Nevertheless, I do not know all possible variants of project files that are out there. Currently, this script works for the projects I worked on, however, you might encounter a project file that has some structures in it that I haven't seen yet.
-
-If the script doesn't work, you might want to open an issue and attach your project file to it.
-
-Note also, that this script can't solve conflicts, that are really conflicts. For example, if you rename a file and a co-worker of yours is going to delete it, well, then you are going to end up in a pretty weird state.
-
-## Usage ##
-
-To use this script, you have to configure it as a merge driver for you project file. To do this, you have to take the following steps:
-
-### Building ###
-
-Execute the following command in the directory of the cloned project:
+Checkout this repo and execute the following command inside the root directory of the project: (its a python script, I promise it does nothing nefarious, you can verify that for yourself if you wish):
 
 ```
 ./build.py
 ```
 
-That should build the mergepbx executable that you can use. It is a specially crafted zip file that contains all needed python files and can directly be executed on the commandline
+Assuming all goes well, an executable file named: `mergepbx` will be generated in same directory. This executable is the actual MergePBX script that performs all the magic.  
+Why didn't we just provide you with that file to begin with?  No idea. Ask Simon, he created this process...
 
-### Using mergepbx as merge tool ###
 
-You can add mergepbx as a merge tool, so you can use it to manually start merging the project file with `git mergetool --tool=mergepbx PROJECT.pbxproj`.
+## Configure git to use MergePBX as a driver ##
 
-#### Add mergepbx as a merge tool ####
+Note: this will configure git to only use `mergepbx` when it encounters a conflict in a PBX file.  This will NOT alter the way git merges any other file types other than "pbxproj" files. 
+It can be disabled at anytime by commenting out or removing the gitconfig lines below or commenting out and/or deleting the lines from the .gitattributes file in the final step below.
 
-Open `~/.gitconfig` (create if it does not exist) and add the following lines to it:
-
-```
-#driver for merging Xcode project files
-[mergetool "mergepbx"]
-	cmd = mergepbx "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"
-```
-
-#### Merging project files ####
-
-After you have encountered a failed automatic merge, you can now use the following command to start the automatic merge with `mergepbx`:
+Open `~/.gitconfig` (create if it does not exist) and add the following lines:
 
 ```
-git mergetool --tool=mergepbx PROJECT.pbxproj
-```
-
-Afterwards, the project file should be merged and marked as resolved.
-
-### Using mergepbx as a merge driver ###
-
-You can also configure git to always use `mergepbx` automatically, when it encounters a conflict in a project file
-
-Open `~/.gitconfig` (create if it does not exist) and add the following lines to it:
-
-```
-#driver for merging Xcode project files
+# use the MergePBX algorithm only on pbxproj files
 [merge "mergepbx"]
         name = Xcode project files merger
-        driver = mergepbx %O %A %B
+        driver = /Users/yourusername/path/to/mergepbx %O %A %B
 ```
 
-Replace mergepbx with the path to the file you downloaded (You might want to add that file to your $PATH)
+Replace the path in the last line above with the correct path to the `mergepbx` executable file you generated using the `build.py` command above.
 
-#### Configure your repository to use the driver ####
+## Configure your repo to use the driver ##
 
-In your repository root directory, open the file `.gitattributes` (create if it does not exist). Add the following lines to it:
+In the root directory of any and all local git repos you wish to use MergePBX on, open the file `.gitattributes` (create if it does not exist) and add the following line:
 
 ```
 *.pbxproj merge=mergepbx
 ```
+This allows you to enable or disable MergePBX on a project by project basis.
 
-#### Merging project files ####
+## Testing whether MergePBX is working ##
 
-If you merge branches with git now, git will automatically use mergepbx for .pbxproj files. You don't have to do anything special, simply merge your branches as before.
+If you merge/rebase any branches with git, git will automatically invoke mergepbx for all .pbxproj files. You don't have to do anything special, simply merge/rebase your branches as you did before. 
+The results should speak for themselves....
 
-Note that this script is not really fast, I didn't optimize it for speed and especially the plist parser is not very fast.
-
-## Alternatives ##
-
-An alternative to using this script, is to use the union merge driver of git, by adding the following line to `.gitattributes`:
-
-```
-*.pbxproj merge=union
-```
-
-This tells git to combine the files by adding lines from both, the remote file and your local file. That works most of the time, however it is not bulletproof, as git still has no idea what it is doing here.
-If my script does not work for you, you can however try out this strategy.
-
-## How to help ##
-
-If you encounter a project file that can not be parsed, please open an issue and attach the project file to it. I will then take a look at it and add the missing parts to the script
+**Note:** MergePBX can be quite slow.  It is not optimized for speed.  We leave that as an exercise for the reader.... 
 
 ## Disclaimer ##
 
+**Use at your own risk**
 This code published here and any programs that are created from it are not claimed to be fit for any purpose.
 Running them might lead to your project being eliminated, kittens killed and the end of the world.
-
 Be careful, you have been warned!
+
+**Reality has limits** 
+MergePBX can only add context to git's merge algorithm, it cannot resolve _genuine_ code conflicts.  For example: if you rename a file and your co-worker deletes that same file, the resulting merged file 
+is not going to make logical sense even with MergePBX properly configured.    There's no magic wand for everthing...
+
 
 ## Contributers ##
 
 * Simon Wagner
+* Daniel Larson
+* Mike Jones
